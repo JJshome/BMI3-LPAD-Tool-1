@@ -1,7 +1,7 @@
 # LAMP-Primer-Auto-design-Tool
 
 ### 1. **理解LAMP引物的设计需求**：
-![[Pasted image 20241106154754.png]]
+![Pasted image 20241106154754](https://github.com/user-attachments/assets/53370d77-0a43-437c-82fa-0a87d77aef73)
 - **引物数量与类型**：LAMP扩增需要六个引物：前内引物 (FIP)、后内引物 (BIP)、两个外引物 (F3和B3)，以及两个环引物 (LF和LB)。这些引物是用来锁定特定的靶序列区域的。
 - **引物的间距和方向**：LAMP引物设计要求非常严格的间距和结合模式，比如FIP和BIP要在目标序列上相隔一定的距离，确保高效的环状结构形成，从而实现等温扩增。
 
