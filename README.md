@@ -48,7 +48,7 @@ The calculated Tm is affected by experimental conditions such as the salt concen
 The Tm for each region is designed to be about 65°C (64 - 66°C) for F1c and B1c, about 60°C (59 - 61°C) for F2,
  B2, F3, and B3, and about 65°C (64 - 66°C) for the loop primers. 
 - **GC**%:  --> 40-60
-- **ΔG**:  --> <-4
+- **ΔG**:  --> ![Uploading image.png…]() <-4
 - **二级结构**: 使用现有的工具，例如RNAfold或mfold, 来预测自由能变化，以便找出引物的可能二级结构（例如：发夹结构、二聚体等）。
 - ...
 
