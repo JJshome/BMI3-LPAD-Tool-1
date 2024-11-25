@@ -39,7 +39,14 @@
 
 ### 算法可行性：
 
-- **TM**:  --> 58-63
+- **TM**: 
+Tm is estimated using the Nearest-Neighbor method. This method is currently considered to be the
+ approximation method that gives the value closest to the actual value. 
+The calculated Tm is affected by experimental conditions such as the salt concentration and oligo concentration,
+ so it is preferred that Tm be calculated under fixed experimental conditions (oligo concentration at 0.1 µM, sodium
+ ion concentration at 50 mM, magnesium ion concentration at 4 mM). 
+The Tm for each region is designed to be about 65°C (64 - 66°C) for F1c and B1c, about 60°C (59 - 61°C) for F2,
+ B2, F3, and B3, and about 65°C (64 - 66°C) for the loop primers. 
 - **GC**%:  --> 40-60
 - **ΔG**:  --> <-4
 - **二级结构**: 使用现有的工具，例如RNAfold或mfold, 来预测自由能变化，以便找出引物的可能二级结构（例如：发夹结构、二聚体等）。
