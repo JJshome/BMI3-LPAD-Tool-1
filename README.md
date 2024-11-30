@@ -1,4 +1,4 @@
-# LAMP-Primer-Auto-design-Tool
+# LAMP Primer Auto design(LPAD) Tool
 
 ### 1. **理解LAMP引物的设计需求**：
 ![Pasted image 20241106154754](https://github.com/user-attachments/assets/53370d77-0a43-437c-82fa-0a87d77aef73)
