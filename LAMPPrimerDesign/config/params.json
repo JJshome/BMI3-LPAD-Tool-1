@@ -1,0 +1,22 @@
+{
+    "primer_length": {
+      "min": 18,
+      "max": 25
+    },
+    "primer_spacing": {
+      "F3_F2": {"min": 60, "max": 80},
+      "F2_F1c": {"min": 60, "max": 80},
+      "F1c_B1c": {"min": 60, "max": 80},
+      "B1c_B2": {"min": 60, "max": 80},
+      "B2_B3": {"min": 60, "max": 80}
+    },
+    "gc_content": {
+      "min": 0.4,
+      "max": 0.6
+    },
+    "tm": {
+      "min": 50.0,
+      "max": 60.0
+    }
+  }
+  
