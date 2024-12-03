@@ -9,5 +9,4 @@ start_pos_list = [50, 69, 142, 171, 200, 226]
 # 计算打分
 scores = score_primers(primer_list, start_pos_list)
 
-# 生成PDF报告
-create_pdf_with_features_and_scores(primer_list, start_pos_list, scores)
+
