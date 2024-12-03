@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 
 fasta_file = "oneseq.fasta"  # 文件路径
 record = SeqIO.read(fasta_file, "fasta")
-result_handle= NCBIWWW.qblast("blastn", "nt", record.seq)
+result_handle= NCBIWWW.qblast("blastn", "human_genome", record.seq)
 with open("my_blast.xml","w") as out_handle:
     out_handle.write(result_handle.read())
 result_handle.close()
