@@ -10,15 +10,10 @@ def score_primers(primer_list, start_pos_list):
     :param start_pos_list: 6个引物起始位置的列表
     :return: 包含各个引物特征的字典，方便后续绘制图表
     """
-    # 权重设置（可以根据具体需求进行调整）
-    WEIGHT_GC = 0.2  # GC含量权重
-    WEIGHT_TM = 0.3  # Tm值权重
-    WEIGHT_DELTA_G = 0.2  # 自由能（Delta G）权重
-    WEIGHT_HAIRPIN = 0.3  # 发卡结构权重
+    primer_set = ['F3', 'F2', 'F1c', 'B1c', 'B2', 'B3']
 
     # 初始化返回数据字典
     primer_scores = []
-    total_score = 0
 
     # 定义评分常数
     GC_CONTENT_MIN = 40  # GC含量最低值
@@ -77,12 +72,9 @@ def score_primers(primer_list, start_pos_list):
         delta_g_score = 1 if terminal_delta_g_5p <= DELTA_G_MAX and terminal_delta_g_3p <= DELTA_G_MAX else 0
         hairpin_score = 0 if secondary_structure else 1
 
-        # 使用权重来计算加权得分
-        weighted_score = round((gc_score * WEIGHT_GC + tm_score * WEIGHT_TM +
-                                delta_g_score * WEIGHT_DELTA_G + hairpin_score * WEIGHT_HAIRPIN), 2)
-
         # 将每个引物的得分保存
         primer_scores.append({
+            'primer': primer_set[i],
             'sequence': primer,
             'gc': gc,
             'tm': tm,
@@ -93,11 +85,8 @@ def score_primers(primer_list, start_pos_list):
             'tm_score': tm_score,
             'delta_g_score': delta_g_score,
             'hairpin_score': hairpin_score,
-            'weighted_score': weighted_score
         })
 
-        # 计算总得分
-        total_score += weighted_score
 
     # 计算引物间的多重特征（距离）
     distances = primers_distance(primer_list, start_pos_list)
@@ -112,6 +101,8 @@ def score_primers(primer_list, start_pos_list):
     distance_B2_B3_score = round(
         max(0, min(1, (DISTANCE_B2_B3_MAX - distances['distance_B2_to_B3']) / DISTANCE_B2_B3_MAX)), 2)
 
+    distance_score = round(distance_F2_B2_score + distance_F2_F1_score + distance_F2_F3_score + distance_B2_B1_score + distance_B2_B3_score,2)
+
     # 计算二聚体评分
     dimer_count = if_dimer(primer_list)
     dimer_score = max(0, 4 - dimer_count)  # 没有二聚体时评分为1，存在二聚体时扣分
@@ -119,14 +110,13 @@ def score_primers(primer_list, start_pos_list):
     # 计算二聚体状态
     dimer_count = if_dimer(primer_list)
 
-    total_score += distance_F2_B2_score + distance_F2_F1_score + distance_F2_F3_score + distance_B2_B1_score + distance_B2_B3_score + dimer_score
-
     # 返回所有可视化报告所需的数据
     return {
-        'primer_scores': primer_scores,
+        'single_primer_scores': primer_scores,
         'distances': distances,
+        'distance_score': distance_score,
         'dimer_count': dimer_count,
-        'total_score': total_score
+        'dimer_score': dimer_score,
     }
 
 

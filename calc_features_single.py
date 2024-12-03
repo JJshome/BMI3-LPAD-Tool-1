@@ -77,7 +77,7 @@ def calc_tm(primer):
         dntp_conc=0.2,  # dNTP concentration(mM)
         dna_conc=100.0,  # DNA concentration(nM)
     )
-    return tm
+    return round(tm,2)
 
 
 def calc_terminal_delta_g(primer, end_length=6):
@@ -111,7 +111,7 @@ def calc_terminal_delta_g(primer, end_length=6):
             dS += nn_s.get(pair, 0)  # 查找该对的熵值
 
         # 转换单位：dH 从 cal/mol 转为 kcal/mol，dS 从 cal/mol·K 转为 kcal/mol·K
-        dH *= -100.0
+        dH *= -0.1
         dS *= -0.1
 
         # 计算自由能（ΔG），单位为 kcal/mol
