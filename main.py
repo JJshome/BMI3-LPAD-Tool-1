@@ -1,5 +1,5 @@
 from primer_score import score_primers
-from plot_report import create_pdf_with_features_and_scores
+import plot_report
 
 # 假设 primer_list 和 start_pos_list 是你的输入数据
 primer_list = ["CTGGTTGTCAAACAACTGG", "TAATAATCTTGGTGGCGTTG", "TACCATAACCAGCTGCTGCG", 
