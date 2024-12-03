@@ -37,12 +37,12 @@ def gc_percent(primer):
     g_count = primer.count('G')  
     c_count = primer.count('C')  
     total_count = len(primer)  
-    return ((g_count + c_count) / total_count) * 100  
+    return round(((g_count + c_count) / total_count) * 100,2)  
 
 def calc_tm_long(dna):  
     """Calculate Tm for long primers (length > 36)."""  
     gc_pct = gc_percent(dna)  
-    return 81.5 + (16.6 * (math.log(50 / 1000.0) / math.log(10))) + (41.0 * (gc_pct / 100)) - (600.0 / len(dna))  
+    return round(81.5 + (16.6 * (math.log(50 / 1000.0) / math.log(10))) + (41.0 * (gc_pct / 100)) - (600.0 / len(dna)),2)
 
 def calc_tm_short(primer):  
     """Calculate Tm for short primers (length <= 36)."""  
@@ -55,7 +55,7 @@ def calc_tm_short(primer):
     dH *= -100.0  
     dS *= -0.1  
     tm = (dH / (dS + 1.987 * math.log(100 / 4000000000.0))) - 273.15 + 16.6 * (math.log(50 / 1000.0) / math.log(10))  
-    return tm  
+    return round(tm)  
 
 
 def calc_tm(primer):  
@@ -70,36 +70,48 @@ def calc_tm(primer):
 
 def calc_terminal_delta_g(primer, end_length=6):
     """
-    计算引物末端区域的自由能(ΔG),用于评估3'端和5'端的稳定性。
+    计算引物末端区域的自由能(ΔG)，分别评估5'端和3'端的稳定性。
     :param primer: 引物序列
     :param end_length: 末端区域的长度(默认是6个碱基)
-    :return: 末端自由能值
+    :return: (5'端自由能值, 3'端自由能值)
     """
     # 确保引物长度大于等于 end_length
     if len(primer) < end_length:
         raise ValueError("Primer length must be greater than or equal to the end_length.")
-
-    # 计算末端区域序列（3'端或5'端的 end_length 个碱基）
-    terminal_seq = primer[-end_length:]  # 取引物的末端部分
-
-    # 已定义的热力学参数 nn_h 和 nn_s
-    dH = 0  # 焓变化
-    dS = 0  # 熵变化
     
-    # 计算末端区域的 dH 和 dS
-    for i in range(len(terminal_seq) - 1):
-        pair = terminal_seq[i:i+2]  # 获取相邻的两碱基对
-        dH += nn_h.get(pair, 0)  # 查找该对的焓值
-        dS += nn_s.get(pair, 0)  # 查找该对的熵值
+    # 计算末端区域序列
+    five_prime_seq = primer[:end_length]  # 获取5'端的 end_length 个碱基
+    three_prime_seq = primer[-end_length:]  # 获取3'端的 end_length 个碱基
 
-    dH *= -100.0  # 转换单位，单位从 cal/mol 转为 kcal/mol
-    dS *= -0.1  # 转换单位，单位从 cal/mol/K 转为 kcal/mol/K
-    
-    # 计算自由能（ΔG）
-    T = 310  # 温度，假设为37°C，即310K
-    delta_g = (dH / (dS + 1.987 * math.log(100 / 4000000000.0))) - 273.15 + 16.6 * (math.log(50 / 1000.0) / math.log(10))
+    def calculate_delta_g(sequence):
+        """
+        计算给定序列的自由能（ΔG）
+        :param sequence: 输入序列（5'端或3'端）
+        :return: 自由能值
+        """
+        dH = 0  # 焓变化
+        dS = 0  # 熵变化
+        
+        # 计算序列的 dH 和 dS
+        for i in range(len(sequence) - 1):
+            pair = sequence[i:i+2]  # 获取相邻的两碱基对
+            dH += nn_h.get(pair, 0)  # 查找该对的焓值
+            dS += nn_s.get(pair, 0)  # 查找该对的熵值
+        
+        dH *= -100.0  # 转换单位，单位从 cal/mol 转为 kcal/mol
+        dS *= -0.1  # 转换单位，单位从 cal/mol/K 转为 kcal/mol/K
+        
+        # 计算自由能（ΔG）
+        T = 310  # 温度，假设为37°C，即310K
+        delta_g = (dH / (dS + 1.987 * math.log(100 / 4000000000.0))) - 273.15 + 16.6 * (math.log(50 / 1000.0) / math.log(10))
+        
+        return delta_g
 
-    return delta_g
+    # 分别计算5'端和3'端的ΔG
+    five_prime_delta_g = round(calculate_delta_g(five_prime_seq),2)
+    three_prime_delta_g = round(calculate_delta_g(three_prime_seq),2)
+
+    return five_prime_delta_g, three_prime_delta_g
 
 
 def if_secondary_structure(primer: str) -> bool:

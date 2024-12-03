@@ -24,8 +24,8 @@ def primers_distance(primer_list, start_pos_list):
 
 def if_dimer(primer_list):
     # 定义互补区段长度的最小和最大阈值
-    min_dimer_length = 5
-    max_dimer_length = 10
+    min_dimer_length = 8
+    max_dimer_length = 16
     
     # 用来统计符合条件的dimer对的数量
     dimer_count = 0
