@@ -1,5 +1,0 @@
-{
-    "reference_genome": "/path/to/reference/genome.fasta",
-    "blast_database": "/path/to/blast/database"
-  }
-  
