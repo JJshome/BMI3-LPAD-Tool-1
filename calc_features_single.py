@@ -36,10 +36,17 @@ def reverse_complement(seq):
 
 
 def gc_percent(primer):
-    """Calculate GC percentage of the primer."""
-    g_count = primer.count('G')
-    c_count = primer.count('C')
+    # Ensure primer is not empty before attempting to calculate GC content
+    if not primer:
+        raise ValueError("Primer sequence is empty.")
+    
+    g_count = primer.lower().count('g')
+    c_count = primer.lower().count('c')
     total_count = len(primer)
+    
+    if total_count == 0:
+        raise ValueError("Primer sequence has no valid nucleotides.")
+    
     return round(((g_count + c_count) / total_count) * 100, 2)
 
 

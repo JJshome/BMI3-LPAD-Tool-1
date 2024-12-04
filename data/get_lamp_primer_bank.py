@@ -11,16 +11,13 @@ data = response.json().get('data', [])  # 使用 get 方法确保即使没有 'd
 # 整理数据
 formatted_data = []
 for item in data:
-    # 检查 position 是否存在和不为 None
-    position = item.get("position")
-    start_position = position.split('-')[0] if position else None  # 确保 position 不为 None
 
     row = {
         "id": item.get("id"),
         "genbank": item.get("genbank"),
         "name": item.get("name"),
         "sequence": item.get("sequence"),
-        "start_position": start_position,
+        "position": item.get("position"),
         "lamp_id": item.get("lamp_id")
     }
     formatted_data.append(row)
