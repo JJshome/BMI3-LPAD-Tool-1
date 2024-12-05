@@ -58,7 +58,7 @@ important.
 
 - **引物间距**:
   
-![image](https://github.com/user-attachments/assets/31048e0f-552f-4ecf-b96f-41a9465b3db9)
+![image](https://github.com/user-attachments/assets/b17927cc-ba45-47dc-9bfc-23f14752519c)
 
 （参考Primer Explorer文档）
 
