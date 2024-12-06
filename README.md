@@ -2,7 +2,7 @@
 
 ### Overall Pipeline
 
-![image](https://github.com/user-attachments/assets/937c5124-fdd5-4e4f-b3fd-21793d9fd273)
+<img src="https://github.com/user-attachments/assets/937c5124-fdd5-4e4f-b3fd-21793d9fd273" width="500" />
 
 ### 1. **设计需求**：
 
