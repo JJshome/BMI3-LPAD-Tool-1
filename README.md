@@ -1,7 +1,10 @@
 # LAMP Primer Auto design(LPAD) Tool
 
+### Overall Pipeline
+
+[Pipeline.pdf](https://github.com/user-attachments/files/18037503/Pipeline.pdf)
+
 ### 1. **设计需求**：
-![Pasted image 20241106154754](https://github.com/user-attachments/assets/53370d77-0a43-437c-82fa-0a87d77aef73)
 
 LAMP扩增需要六个引物：前内引物 (FIP)、后内引物 (BIP)、两个外引物 (F3和B3)，以及两个环引物 (LF和LB)。这些引物是用来锁定特定的靶序列区域的。其中，环引物不一定是需要的。本项目主要针对于自动设计前内引物 (FIP)、后内引物 (BIP)、两个外引物 (F3和B3)，并自动化输出优质的F1,F2,F3;B1,B2,B3引物。
 
@@ -78,6 +81,6 @@ dimer设计：检查是否序列间有8-16bp的互补区域.
 
 ### Benchmark 三步：
 
-1. primer可行性：取任何published文章中使用的primer，投入我们的工具，检查primer的分数是否较好；
-2. 工具可行性：取published文章中的扩增序列与选用的primer，将扩增序列投入检查是否结果中有对应primer且分数良好；
+1. primer可行性：取published文章中的扩增序列与选用的primer，将扩增序列投入检查是否结果中有对应primer且分数良好；
+2. 工具可行性：取任何published文章中使用的primer，投入我们的工具，检查primer的分数是否较好；
 3. 各工具对比：取相同扩增序列若干，投入PrimerExplorer5, NEB LAMP and PremierBiosoft，检查各个工具结果是否类似。
