@@ -60,8 +60,8 @@ is –4 kcal/ mol or less. The 5’ end of F1c after amplification corresponds t
 important.
 
 - **引物间距**:
-  
-![image](https://github.com/user-attachments/assets/b17927cc-ba45-47dc-9bfc-23f14752519c)
+
+<img src="https://github.com/user-attachments/assets/b17927cc-ba45-47dc-9bfc-23f14752519c" width="700" />
 
 （参考Primer Explorer文档）
 
