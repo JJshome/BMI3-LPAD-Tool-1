@@ -11,3 +11,6 @@ dependencies:
   - biopython=1.78
   - pandas
   - blast
+  - joblib
+  - argparse
+  - scipy
