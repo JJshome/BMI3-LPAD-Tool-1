@@ -10,7 +10,7 @@ DEFAULT_OUTPUT_DIR = './data/output/Final_score'
 
 def main(input_file, ref_file, output_dir):
     find_primers(input_file)
-    specificity_screening(ref_file)
+    specificity_screening(input_file, ref_file)
     process_input_file()
     save_full_scores()
     merge_results(output_dir)
