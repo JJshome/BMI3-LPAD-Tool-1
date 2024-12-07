@@ -40,11 +40,10 @@ def score_primers(primer_list, start_pos_list):
         terminal_delta_g_5p, terminal_delta_g_3p = calc_terminal_delta_g(primer)
         secondary_structure = if_secondary_structure(primer)
 
-        # 计算引物的单项特征得分
-        gc_score = max(0, min(1, 1 - (gc - (GC_CONTENT_MAX + GC_CONTENT_MIN) / 2) / (GC_CONTENT_MAX - GC_CONTENT_MIN)))
+        # 计算引物的GC得分
+        gc_score = 0.7 if GC_CONTENT_MIN <= gc <= GC_CONTENT_MAX else 0
         if GC_CONTENT_OPT[0] <= gc <= GC_CONTENT_OPT[1]:
-            gc_score += 1
-        gc_score = round(gc_score, 2)
+            gc_score += 0.3
 
         def calculate_tm_score(tm, tm_min, tm_max):
             if tm_min <= tm <= tm_max:
@@ -69,8 +68,20 @@ def score_primers(primer_list, start_pos_list):
             tm_score = calculate_tm_score(tm, Tm_F1c_B1c_MIN, Tm_F1c_B1c_MAX)
         else:  # F2, B2, F3, B3, Loop
             tm_score = calculate_tm_score(tm, Tm_F2_B2_F3_B3_LOOP_MIN, Tm_F2_B2_F3_B3_LOOP_MAX)
-        delta_g_score = 1 if terminal_delta_g_5p <= DELTA_G_MAX and terminal_delta_g_3p <= DELTA_G_MAX else 0
-        hairpin_score = 0 if secondary_structure else 1
+
+        # 计算引物末端自由能得分
+        delta_g_score = 0
+        if i == 2 or i == 3:
+            if terminal_delta_g_5p <= DELTA_G_MAX:
+                delta_g_score += 1
+        else:
+            if terminal_delta_g_3p <= DELTA_G_MAX:
+                delta_g_score += 1
+
+        # 二级结构打分
+        hairpin_score = 0 if secondary_structure[0] else 0.5
+        if secondary_structure[1] < 4.5:
+            hairpin_score += 0.5
 
         # 将每个引物的得分保存
         primer_scores.append({
@@ -80,32 +91,33 @@ def score_primers(primer_list, start_pos_list):
             'tm': tm,
             'delta_g_5p': terminal_delta_g_5p,
             'delta_g_3p': terminal_delta_g_3p,
-            'hairpin': hairpin_score,
+            'hairpin': secondary_structure,
             'gc_score': gc_score,
             'tm_score': tm_score,
             'delta_g_score': delta_g_score,
             'hairpin_score': hairpin_score,
         })
 
-
     # 计算引物间的多重特征（距离）
     distances = primers_distance(primer_list, start_pos_list)
     distance_F2_B2_score = round(max(0, min(1, (DISTANCE_F2_B2_MAX - distances['distance_F2_to_B2_end']) / (
-                DISTANCE_F2_B2_MAX - DISTANCE_F2_B2_MIN))), 2)
+            DISTANCE_F2_B2_MAX - DISTANCE_F2_B2_MIN))), 2)
     distance_F2_F1_score = round(max(0, min(1, (DISTANCE_F2_F1_MAX - distances['distance_F2_to_F1']) / (
-                DISTANCE_F2_F1_MAX - DISTANCE_F2_F1_MIN))), 2)
+            DISTANCE_F2_F1_MAX - DISTANCE_F2_F1_MIN))), 2)
     distance_F2_F3_score = round(
         max(0, min(1, (DISTANCE_F2_F3_MAX - distances['distance_F2_to_F3']) / DISTANCE_F2_F3_MAX)), 2)
     distance_B2_B1_score = round(max(0, min(1, (DISTANCE_B2_B1_MAX - distances['distance_B2_to_B1']) / (
-                DISTANCE_B2_B1_MAX - DISTANCE_B2_B1_MIN))), 2)
+            DISTANCE_B2_B1_MAX - DISTANCE_B2_B1_MIN))), 2)
     distance_B2_B3_score = round(
         max(0, min(1, (DISTANCE_B2_B3_MAX - distances['distance_B2_to_B3']) / DISTANCE_B2_B3_MAX)), 2)
 
-    distance_score = round(distance_F2_B2_score + distance_F2_F1_score + distance_F2_F3_score + distance_B2_B1_score + distance_B2_B3_score,2)
+    distance_score = round(
+        (distance_F2_B2_score + distance_F2_F1_score + distance_F2_F3_score + distance_B2_B1_score + distance_B2_B3_score)/5,
+        2)
 
     # 计算二聚体评分
     dimer_count = if_dimer(primer_list)
-    dimer_score = max(0, 4 - dimer_count)  # 没有二聚体时评分为1，存在二聚体时扣分
+    dimer_score = round(max(0, 1 - dimer_count / 3),2)  # 没有二聚体时评分为1，存在二聚体时扣分
 
     # 计算二聚体状态
     dimer_count = if_dimer(primer_list)

@@ -1,4 +1,6 @@
 import math
+from typing import Tuple, Any
+
 import primer3
 
 # Dictionary for delta H values  
@@ -122,7 +124,7 @@ def calc_terminal_delta_g(primer, end_length=6):
         dS *= -0.1
 
         # 计算自由能（ΔG），单位为 kcal/mol
-        T = 310  # 假设温度为37°C，即310K
+        T =  333.15 # 60C
         delta_g = dH - T * dS / 1000.0  # ΔG 公式
 
         return round(delta_g, 2)
@@ -134,14 +136,16 @@ def calc_terminal_delta_g(primer, end_length=6):
     return five_prime_delta_g, three_prime_delta_g
 
 
-def if_secondary_structure(primer: str) -> bool:
+def if_secondary_structure(primer: str) -> tuple[bool, Any]:
     # 定义发卡结构的最小和最大互补区段长度
-    min_stem_length = 6
+    min_stem_length = 4
     max_stem_length = 12
 
     # 定义环状区段的长度范围
     min_loop_length = 4
     max_loop_length = 8
+
+    if_hairpin = False
 
     # 遍历引物序列，查找自互补区域
     for length in range(min_stem_length, max_stem_length + 1):
@@ -159,5 +163,9 @@ def if_secondary_structure(primer: str) -> bool:
 
                 # 检查环状区段的长度是否在限制范围内
                 if min_loop_length <= distance <= max_loop_length:
-                    return True
-    return False
+                    if_hairpin = True
+
+    hairpin = primer3.calc_hairpin(seq=primer)
+    hairpin_dG = round(hairpin.dg/1000,2)
+
+    return if_hairpin, hairpin_dG

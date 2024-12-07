@@ -2,7 +2,6 @@ import primer3
 from Bio import SeqIO
 import csv
 
-
 """
 ------------------------------------------------------------------------------------------------
 Prepare parameters for LAMP primers
@@ -20,7 +19,6 @@ outer_primer_params = {
     "PRIMER_INTERNAL_DNTP_CONC": 1.4,  # dntp_conc
     "PRIMER_NUM_RETURN": 8888,  # max_primer_gen
 }
-
 
 loop_primer_params = {
     "PRIMER_INTERNAL_OPT_SIZE": 20,  # loop_primer_target_length
@@ -61,9 +59,6 @@ inner_primer_params = {
     "PRIMER_NUM_RETURN": 8888,  # max_primer_gen
 }
 
-
-
-
 """
 ------------------------------------------------------------------------------------------------
 Step 1: Generate the DNA oligonucleotide primer sets independently
@@ -82,6 +77,8 @@ their position and penalty score, and remove primers with excessive overlap acco
 preset threshold.
 ------------------------------------------------------------------------------------------------
 """
+
+
 def run_primer3(sequence, primer_params, reverse=False):
     """
     Generate oligos for the coding strand or template strand based on the reverse flag.
@@ -133,6 +130,7 @@ def run_primer3(sequence, primer_params, reverse=False):
 
     return results
 
+
 def extract_oligos(primer3_results, sequence_length=None, is_reverse=False):
     """
     Extract oligos from Primer3 results with sequence information, 
@@ -166,6 +164,7 @@ def extract_oligos(primer3_results, sequence_length=None, is_reverse=False):
 
     return oligos
 
+
 def filter_forward_oligos(oligos, sequence, quasispecies_sequences):
     """
     Filter oligos based on their sequence matching across all sequences in the list. Only used when evolutionary conservation is considered
@@ -195,6 +194,7 @@ def filter_forward_oligos(oligos, sequence, quasispecies_sequences):
         filtered_oligos = surviving_oligos
 
     return filtered_oligos
+
 
 def filter_reverse_oligos(oligos, sequence, quasispecies_sequences):
     """
@@ -226,6 +226,7 @@ def filter_reverse_oligos(oligos, sequence, quasispecies_sequences):
 
     return filtered_oligos
 
+
 def sort_oligos(oligos):
     """
     Sort oligos by location and penalty.
@@ -246,6 +247,7 @@ def sort_oligos(oligos):
         sort_by_location,
         sort_by_penalty
     )
+
 
 def reduce_primers_by_overlap(oligos, max_overlap_percent, is_reverse=False):
     """
@@ -315,6 +317,7 @@ def reduce_primers_by_overlap(oligos, max_overlap_percent, is_reverse=False):
 
     return sorted(selected_primers, key=lambda x: x['position'])
 
+
 def move_position(oligos, mode='end_to_start'):
     """
     Convert the 'position' of each oligo between end and start based on the mode,
@@ -373,8 +376,6 @@ def move_position(oligos, mode='end_to_start'):
     return updated_oligos
 
 
-
-
 """
 ------------------------------------------------------------------------------------------------
 Step 2: Combine the primers to generate the LAMP primer sets
@@ -396,12 +397,14 @@ excessive overlap according to a predefined threshold.
 primer combination scoring system to obtain the final set of LAMP primer combinations.
 ------------------------------------------------------------------------------------------------
 """
+
+
 def find_best_forward_combinations(
-    inner_forward, loop_forward, middle_forward, outer_forward,
-    signature_max_length, min_primer_spacing, loop_min_gap,
-    include_loop_primers, distance_penalties,
-    penalty_weights,  # [inner, loop, middle, outer]
-    to_penalty_weights  # [inner_to_loop, loop_to_middle, middle_to_outer]
+        inner_forward, loop_forward, middle_forward, outer_forward,
+        signature_max_length, min_primer_spacing, loop_min_gap,
+        include_loop_primers, distance_penalties,
+        penalty_weights,  # [inner, loop, middle, outer]
+        to_penalty_weights  # [inner_to_loop, loop_to_middle, middle_to_outer]
 ):
     """
     Find the best forward combinations based on penalties and spacing constraints.
@@ -480,7 +483,7 @@ def find_best_forward_combinations(
 
                 # Check spacing constraints for middle primers
                 if (middle_location + middle_length + min_primer_spacing > loop_location - loop_length + 1) or \
-                   (middle_location + middle_length + loop_min_gap > inner_location):
+                        (middle_location + middle_length + loop_min_gap > inner_location):
                     continue
 
                 # Calculate range for outer primers
@@ -510,25 +513,25 @@ def find_best_forward_combinations(
                     # Calculate penalties
                     if include_loop_primers:
                         spacing_penalty = (
-                            distance_penalties[inner_to_loop_distance - 15] * inner_to_loop_penalty_weight +
-                            distance_penalties[loop_to_middle_distance - 15] * loop_to_middle_penalty_weight +
-                            distance_penalties[middle_to_outer_distance - 30] * middle_to_outer_penalty_weight
+                                distance_penalties[inner_to_loop_distance - 15] * inner_to_loop_penalty_weight +
+                                distance_penalties[loop_to_middle_distance - 15] * loop_to_middle_penalty_weight +
+                                distance_penalties[middle_to_outer_distance - 30] * middle_to_outer_penalty_weight
                         )
                         primer3_penalty = (
-                            inner_penalty * inner_penalty_weight +
-                            loop_penalty * loop_penalty_weight +
-                            middle_penalty * middle_penalty_weight +
-                            outer_penalty * outer_penalty_weight
+                                inner_penalty * inner_penalty_weight +
+                                loop_penalty * loop_penalty_weight +
+                                middle_penalty * middle_penalty_weight +
+                                outer_penalty * outer_penalty_weight
                         )
                     else:
                         spacing_penalty = (
-                            distance_penalties[inner_to_middle_distance - 30] * inner_to_loop_penalty_weight +
-                            distance_penalties[middle_to_outer_distance - 30] * middle_to_outer_penalty_weight
+                                distance_penalties[inner_to_middle_distance - 30] * inner_to_loop_penalty_weight +
+                                distance_penalties[middle_to_outer_distance - 30] * middle_to_outer_penalty_weight
                         )
                         primer3_penalty = (
-                            inner_penalty * inner_penalty_weight +
-                            middle_penalty * middle_penalty_weight +
-                            outer_penalty * outer_penalty_weight
+                                inner_penalty * inner_penalty_weight +
+                                middle_penalty * middle_penalty_weight +
+                                outer_penalty * outer_penalty_weight
                         )
 
                     forward_set_penalty = spacing_penalty + primer3_penalty
@@ -542,17 +545,18 @@ def find_best_forward_combinations(
                             best_forward_penalties.append(None)
                         best_forward_infos[inner_index] = [loop_info, middle_info, outer_info]
                         best_forward_penalties[inner_index] = [spacing_penalty, primer3_penalty]
-    
+
     forward_set_count = sum(1 for item in best_forward_infos if item is not None)
 
     return best_forward_infos, best_forward_penalties, forward_set_count
 
+
 def find_best_reverse_combinations(
-    inner_reverse, loop_reverse, middle_reverse, outer_reverse,
-    signature_max_length, min_primer_spacing, loop_min_gap,
-    include_loop_primers, distance_penalties,
-    penalty_weights,  # [inner, loop, middle, outer]
-    to_penalty_weights  # [inner_to_loop, loop_to_middle, middle_to_outer]
+        inner_reverse, loop_reverse, middle_reverse, outer_reverse,
+        signature_max_length, min_primer_spacing, loop_min_gap,
+        include_loop_primers, distance_penalties,
+        penalty_weights,  # [inner, loop, middle, outer]
+        to_penalty_weights  # [inner_to_loop, loop_to_middle, middle_to_outer]
 ):
     """
     Find the best reverse primer combinations based on penalties and spacing constraints.
@@ -628,7 +632,7 @@ def find_best_reverse_combinations(
 
                 # Check spacing constraints for middle primers
                 if (middle_location - middle_length - min_primer_spacing < loop_location + loop_length - 1) or \
-                   (middle_location - middle_length - loop_min_gap < inner_location):
+                        (middle_location - middle_length - loop_min_gap < inner_location):
                     continue
 
                 # Calculate range for outer primers
@@ -659,25 +663,25 @@ def find_best_reverse_combinations(
                     # Calculate penalties
                     if include_loop_primers:
                         spacing_penalty = (
-                            distance_penalties[inner_to_loop_distance - 15] * inner_to_loop_penalty_weight +
-                            distance_penalties[loop_to_middle_distance - 15] * loop_to_middle_penalty_weight +
-                            distance_penalties[middle_to_outer_distance - 30] * middle_to_outer_penalty_weight
+                                distance_penalties[inner_to_loop_distance - 15] * inner_to_loop_penalty_weight +
+                                distance_penalties[loop_to_middle_distance - 15] * loop_to_middle_penalty_weight +
+                                distance_penalties[middle_to_outer_distance - 30] * middle_to_outer_penalty_weight
                         )
                         primer3_penalty = (
-                            inner_penalty * inner_penalty_weight +
-                            loop_penalty * loop_penalty_weight +
-                            middle_penalty * middle_penalty_weight +
-                            outer_penalty * outer_penalty_weight
+                                inner_penalty * inner_penalty_weight +
+                                loop_penalty * loop_penalty_weight +
+                                middle_penalty * middle_penalty_weight +
+                                outer_penalty * outer_penalty_weight
                         )
                     else:
                         spacing_penalty = (
-                            distance_penalties[inner_to_middle_distance-30] * inner_to_loop_penalty_weight +
-                            distance_penalties[middle_to_outer_distance-30] * middle_to_outer_penalty_weight
+                                distance_penalties[inner_to_middle_distance - 30] * inner_to_loop_penalty_weight +
+                                distance_penalties[middle_to_outer_distance - 30] * middle_to_outer_penalty_weight
                         )
                         primer3_penalty = (
-                            inner_penalty * inner_penalty_weight +
-                            middle_penalty * middle_penalty_weight +
-                            outer_penalty * outer_penalty_weight
+                                inner_penalty * inner_penalty_weight +
+                                middle_penalty * middle_penalty_weight +
+                                outer_penalty * outer_penalty_weight
                         )
 
                     reverse_set_penalty = spacing_penalty + primer3_penalty
@@ -691,10 +695,11 @@ def find_best_reverse_combinations(
                             best_reverse_penalties.append(None)
                         best_reverse_infos[inner_index] = [loop_info, middle_info, outer_info]
                         best_reverse_penalties[inner_index] = [spacing_penalty, primer3_penalty]
-    
+
     reverse_set_count = sum(1 for item in best_reverse_infos if item is not None)
 
     return best_reverse_infos, best_reverse_penalties, reverse_set_count
+
 
 def reduce_result_by_overlap(possible_result, max_overlap_percent=99, sort_by_score=True, sort_by_location=False):
     """
@@ -748,7 +753,8 @@ def reduce_result_by_overlap(possible_result, max_overlap_percent=99, sort_by_sc
             if other_index in unavailable_indices:
                 continue
 
-            other_pos, other_end = other_result["forward_outer_info"]["position"], other_result["reverse_outer_info"]["position"]
+            other_pos, other_end = other_result["forward_outer_info"]["position"], other_result["reverse_outer_info"][
+                "position"]
             other_length = other_pos - other_end + 1
 
             # No overlap, skip
@@ -769,20 +775,21 @@ def reduce_result_by_overlap(possible_result, max_overlap_percent=99, sort_by_sc
         return sorted(selected_results, key=lambda x: x["forward_outer_info"]["position"])
     return sorted(selected_results, key=lambda x: x["penalty"])
 
+
 def find_possible_result(
-    forward_inner_candidates,
-    reverse_inner_candidates,
-    best_forward_infos,
-    best_reverse_infos,
-    best_forward_penalties,
-    best_reverse_penalties,
-    signature_max_length,
-    min_inner_pair_spacing,
-    opt_inner_pair_spacing,
-    Tm_penalties,
-    distance_penalties,
-    include_loop_primers,
-    output_file_path
+        forward_inner_candidates,
+        reverse_inner_candidates,
+        best_forward_infos,
+        best_reverse_infos,
+        best_forward_penalties,
+        best_reverse_penalties,
+        signature_max_length,
+        min_inner_pair_spacing,
+        opt_inner_pair_spacing,
+        Tm_penalties,
+        distance_penalties,
+        include_loop_primers,
+        output_file_path
 ):
     # Initialize variables
     possible_result = []
@@ -841,9 +848,13 @@ def find_possible_result(
             inner_spacing_penalty = distance_penalties[inner_spacing - opt_inner_pair_spacing] * 1  # Example weight: 1
 
             if include_loop_primers:
-                Total_Tm_diff = (abs(finner_info['TM'] - binner_info['TM']) + abs(fmiddle_info['TM'] - bmiddle_info['TM']) + abs(fouter_info['TM'] - bouter_info['TM']) + abs(floop_info['TM'] - bloop_info['TM'])) * Tm_penalties
+                Total_Tm_diff = (abs(finner_info['TM'] - binner_info['TM']) + abs(
+                    fmiddle_info['TM'] - bmiddle_info['TM']) + abs(fouter_info['TM'] - bouter_info['TM']) + abs(
+                    floop_info['TM'] - bloop_info['TM'])) * Tm_penalties
             else:
-                Total_Tm_diff = (abs(finner_info['TM'] - binner_info['TM']) + abs(fmiddle_info['TM'] - bmiddle_info['TM']) + abs(fouter_info['TM'] - bouter_info['TM'])) * Tm_penalties
+                Total_Tm_diff = (abs(finner_info['TM'] - binner_info['TM']) + abs(
+                    fmiddle_info['TM'] - bmiddle_info['TM']) + abs(
+                    fouter_info['TM'] - bouter_info['TM'])) * Tm_penalties
 
             total_penalty = forward_spacing_penalty + inner_spacing_penalty + reverse_spacing_penalty + forward_primer3_penalty + reverse_primer3_penalty + Total_Tm_diff
 
@@ -904,6 +915,7 @@ def find_possible_result(
 
     print(f"Output written to {output_file_path}")
 
+
 def generate_distance_penalties(a=20, b=1.01, max_penalty=100):
     """
     Generate distance penalties based on the maximum distance using the custom function 
@@ -915,11 +927,9 @@ def generate_distance_penalties(a=20, b=1.01, max_penalty=100):
     :return: A list of distance penalties.
     """
     # Generate penalties using f(x) = a * (b^x - 1) and limit to max_penalty
-    penalties = [min(a * (b**x - 1), max_penalty) for x in range(200)]
+    penalties = [min(a * (b ** x - 1), max_penalty) for x in range(200)]
 
     return penalties
-
-
 
 
 """
@@ -927,7 +937,9 @@ def generate_distance_penalties(a=20, b=1.01, max_penalty=100):
 Now we can design LAMP primers by calling the above functions!!!
 ------------------------------------------------------------------------------------------------
 """
-def find_primers(fasta_file):    
+
+
+def find_primers(fasta_file):
     sequence = None
     quasispecies_sequences = []
 
@@ -940,18 +952,26 @@ def find_primers(fasta_file):
             else:
                 # Add subsequent sequences to the quasispecies list
                 quasispecies_sequences.append(str(record.seq))
-                
+
         sequence_length = len(sequence)
-        forward_inner_c_oligos = extract_oligos(run_primer3(sequence, inner_primer_params, reverse=True), sequence_length, is_reverse=True)
-        reverse_inner_c_oligos = extract_oligos(run_primer3(sequence, inner_primer_params, reverse=False), sequence_length, is_reverse=False)
+        forward_inner_c_oligos = extract_oligos(run_primer3(sequence, inner_primer_params, reverse=True),
+                                                sequence_length, is_reverse=True)
+        reverse_inner_c_oligos = extract_oligos(run_primer3(sequence, inner_primer_params, reverse=False),
+                                                sequence_length, is_reverse=False)
         forward_inner_oligos = move_position(forward_inner_c_oligos, 'end_to_start')
         reverse_inner_oligos = move_position(reverse_inner_c_oligos, 'start_to_end')
-        forward_loop_oligos = extract_oligos(run_primer3(sequence, loop_primer_params, reverse=True), sequence_length, is_reverse=True)
-        reverse_loop_oligos = extract_oligos(run_primer3(sequence, loop_primer_params, reverse=False), sequence_length, is_reverse=False)
-        forward_middle_oligos = extract_oligos(run_primer3(sequence, middle_primer_params, reverse=False), sequence_length, is_reverse=False)
-        reverse_middle_oligos = extract_oligos(run_primer3(sequence, middle_primer_params, reverse=True), sequence_length, is_reverse=True)
-        forward_outer_oligos = extract_oligos(run_primer3(sequence, outer_primer_params, reverse=False), sequence_length, is_reverse=False)
-        reverse_outer_oligos = extract_oligos(run_primer3(sequence, outer_primer_params, reverse=True), sequence_length, is_reverse=True)
+        forward_loop_oligos = extract_oligos(run_primer3(sequence, loop_primer_params, reverse=True), sequence_length,
+                                             is_reverse=True)
+        reverse_loop_oligos = extract_oligos(run_primer3(sequence, loop_primer_params, reverse=False), sequence_length,
+                                             is_reverse=False)
+        forward_middle_oligos = extract_oligos(run_primer3(sequence, middle_primer_params, reverse=False),
+                                               sequence_length, is_reverse=False)
+        reverse_middle_oligos = extract_oligos(run_primer3(sequence, middle_primer_params, reverse=True),
+                                               sequence_length, is_reverse=True)
+        forward_outer_oligos = extract_oligos(run_primer3(sequence, outer_primer_params, reverse=False),
+                                              sequence_length, is_reverse=False)
+        reverse_outer_oligos = extract_oligos(run_primer3(sequence, outer_primer_params, reverse=True), sequence_length,
+                                              is_reverse=True)
 
         if quasispecies_sequences:
             forward_outer_oligos = filter_forward_oligos(forward_outer_oligos, sequence, quasispecies_sequences)
@@ -964,9 +984,10 @@ def find_primers(fasta_file):
             reverse_outer_oligos = filter_reverse_oligos(reverse_outer_oligos, sequence, quasispecies_sequences)
             forward_outer_oligos = filter_forward_oligos(forward_outer_oligos, sequence, quasispecies_sequences)
             reverse_outer_oligos = filter_reverse_oligos(reverse_outer_oligos, sequence, quasispecies_sequences)
-            
+
         print("All oligos found!")
-        print(f"Number of oligos are: forward_inner - {len(forward_inner_oligos)}, reverse_inner - {len(reverse_inner_oligos)}, forward_loop - {len(forward_loop_oligos)}, reverse_loop - {len(reverse_loop_oligos)}, forward_middle - {len(forward_middle_oligos)}, reverse_middle - {len(reverse_middle_oligos)}, forward_outer - {len(forward_outer_oligos)}, reverse_outer - {len(reverse_outer_oligos)}")
+        print(
+            f"Number of oligos are: forward_inner - {len(forward_inner_oligos)}, reverse_inner - {len(reverse_inner_oligos)}, forward_loop - {len(forward_loop_oligos)}, reverse_loop - {len(reverse_loop_oligos)}, forward_middle - {len(forward_middle_oligos)}, reverse_middle - {len(reverse_middle_oligos)}, forward_outer - {len(forward_outer_oligos)}, reverse_outer - {len(reverse_outer_oligos)}")
 
         forward_inner_candidates = reduce_primers_by_overlap(forward_inner_oligos, 60, False)
         reverse_inner_candidates = reduce_primers_by_overlap(reverse_inner_oligos, 60, True)
@@ -978,25 +999,28 @@ def find_primers(fasta_file):
         reverse_outer_candidates = reduce_primers_by_overlap(reverse_outer_oligos, 60, True)
 
         print("All candidates prepared by reducing overlaps!")
-        print(f"Number of candidates are:  forward_inner - {len(forward_inner_candidates)}, reverse_inner - {len(reverse_inner_candidates)}, forward_loop - {len(forward_loop_candidates)}, reverse_loop - {len(reverse_loop_candidates)}, forward_middle - {len(forward_middle_candidates)}, reverse_middle - {len(reverse_middle_candidates)}, forward_outer - {len(forward_outer_candidates)}, reverse_outer - {len(reverse_outer_candidates)}")
+        print(
+            f"Number of candidates are:  forward_inner - {len(forward_inner_candidates)}, reverse_inner - {len(reverse_inner_candidates)}, forward_loop - {len(forward_loop_candidates)}, reverse_loop - {len(reverse_loop_candidates)}, forward_middle - {len(forward_middle_candidates)}, reverse_middle - {len(reverse_middle_candidates)}, forward_outer - {len(forward_outer_candidates)}, reverse_outer - {len(reverse_outer_candidates)}")
 
         distance_penalties = generate_distance_penalties()
-        best_forward_infos, best_forward_penalties, forward_set_count = find_best_forward_combinations(forward_inner_candidates,
-                                                                                                    forward_loop_candidates,
-                                                                                                    forward_middle_candidates,
-                                                                                                    forward_outer_candidates,
-                                                                                                    320, 1, 25, True, distance_penalties, 
-                                                                                                    [1.2, 0.7, 1.1, 1.0], [1, 1, 1])
+        best_forward_infos, best_forward_penalties, forward_set_count = find_best_forward_combinations(
+            forward_inner_candidates,
+            forward_loop_candidates,
+            forward_middle_candidates,
+            forward_outer_candidates,
+            320, 1, 25, True, distance_penalties,
+            [1.2, 0.7, 1.1, 1.0], [1, 1, 1])
         print(f'{forward_set_count} sets of forward combinations are generated.')
 
-        best_reverse_infos, best_reverse_penalties, reverse_set_count = find_best_reverse_combinations(reverse_inner_candidates,
-                                                                                                    reverse_loop_candidates,
-                                                                                                    reverse_middle_candidates,
-                                                                                                    reverse_outer_candidates,
-                                                                                                    320, 1, 25, True, distance_penalties, 
-                                                                                                    [1.2, 0.7, 1.1, 1.0], [1, 1, 1])
+        best_reverse_infos, best_reverse_penalties, reverse_set_count = find_best_reverse_combinations(
+            reverse_inner_candidates,
+            reverse_loop_candidates,
+            reverse_middle_candidates,
+            reverse_outer_candidates,
+            320, 1, 25, True, distance_penalties,
+            [1.2, 0.7, 1.1, 1.0], [1, 1, 1])
         print(f'{reverse_set_count} sets of reverse combinations are generated.')
 
         find_possible_result(forward_inner_candidates, reverse_inner_candidates, best_forward_infos, best_reverse_infos,
-                            best_forward_penalties, best_reverse_penalties, 320, 1, 4, 0.6, distance_penalties, True, "./data/output/Intermediate_file/candidate_result.csv")
-            
+                             best_forward_penalties, best_reverse_penalties, 320, 1, 4, 0.6, distance_penalties, True,
+                             "./data/output/Intermediate_file/candidate_result.csv")
