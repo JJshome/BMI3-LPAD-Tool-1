@@ -1,5 +1,5 @@
 # environment.yml
-name: lamp_primer_design
+name: lpad
 channels:
   - defaults
   - bioconda
