@@ -1,6 +1,7 @@
 import subprocess
 import pandas as pd
 import ast
+from Bio import SeqIO
 
 def create_blast_db(fasta_file, db_name):
     """
@@ -91,11 +92,23 @@ def align_input_seq(input_seq,db_name,input_align_output):
     except Exception as e:
         print(f"Failed to parse: {e}")
 
-def specificity_screening(fasta_file = "./data/resource/hg38.fa"):
+def specificity_screening(input_file = './data/input/example.fasta', fasta_file = "./data/resource/hg38.fa"):
     db_name = "./data/resource/blast_db"  # BLAST database name
     output_file = "./data/output/Intermediate_file/blast_output.txt"  # Path to the BLAST output file
-    input_seq="CTGATTGCAGTCGGACCTGCCGCCGCGGCACTTAACAGTTTGCAGAGTGCTTCCCGCCCCTG"
     input_align_output="./data/output/Intermediate_file/input_align_output.txt"
+
+    input_seq = None
+    quasispecies_sequences = []
+
+    # Open the FASTA file and parse the records
+    with open(input_file, "r") as handle:
+        for record in SeqIO.parse(handle, "fasta"):
+            if input_seq is None:
+                # Set the first sequence as the main sequence
+                input_seq = str(record.seq)
+            else:
+                # Add subsequent sequences to the quasispecies list
+                quasispecies_sequences.append(str(record.seq))
 
     df=pd.read_csv("./data/output/Intermediate_file/candidate_result.csv")
     columns = df.columns

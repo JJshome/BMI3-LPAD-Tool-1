@@ -41,14 +41,14 @@ def gc_percent(primer):
     # Ensure primer is not empty before attempting to calculate GC content
     if not primer:
         raise ValueError("Primer sequence is empty.")
-    
+
     g_count = primer.lower().count('g')
     c_count = primer.lower().count('c')
     total_count = len(primer)
-    
+
     if total_count == 0:
         raise ValueError("Primer sequence has no valid nucleotides.")
-    
+
     return round(((g_count + c_count) / total_count) * 100, 2)
 
 
@@ -86,50 +86,50 @@ def calc_tm(primer):
         dntp_conc=0.2,  # dNTP concentration(mM)
         dna_conc=100.0,  # DNA concentration(nM)
     )
-    return round(tm,2)
+    return round(tm, 2)
 
 
 def calc_terminal_delta_g(primer, end_length=6):
     """
-    计算引物末端区域的自由能(ΔG)，分别评估5'端和3'端的稳定性。
-    :param primer: 引物序列
-    :param end_length: 末端区域的长度(默认是6个碱基)
-    :return: (5'端自由能值, 3'端自由能值)
+    Calculate the free energy (ΔG) of the primer terminal region, evaluating both the 5' and 3' ends' stability.
+    :param primer: Primer sequence
+    :param end_length: Length of the terminal region (default is 6 bases)
+    :return: (5' end free energy, 3' end free energy)
     """
-    # 确保引物长度大于等于 end_length
+    # Ensure primer length is greater than or equal to end_length
     if len(primer) < end_length:
         raise ValueError("Primer length must be greater than or equal to the end_length.")
 
-    # 计算末端区域序列
-    five_prime_seq = primer[:end_length]  # 获取5'端的 end_length 个碱基
-    three_prime_seq = primer[-end_length:]  # 获取3'端的 end_length 个碱基
+    # Calculate terminal region sequences
+    five_prime_seq = primer[:end_length]  # Get the first end_length bases for 5' end
+    three_prime_seq = primer[-end_length:]  # Get the last end_length bases for 3' end
 
     def calculate_delta_g(sequence):
         """
-        计算给定序列的自由能（ΔG）
-        :param sequence: 输入序列（5'端或3'端）
-        :return: 自由能值
+        Calculate the free energy (ΔG) for a given sequence
+        :param sequence: Input sequence (5' or 3' end)
+        :return: Free energy value
         """
-        dH = 0  # 焓变化
-        dS = 0  # 熵变化
+        dH = 0  # Enthalpy change
+        dS = 0  # Entropy change
 
-        # 计算序列的 dH 和 dS
+        # Calculate dH and dS for the sequence
         for i in range(len(sequence) - 1):
-            pair = sequence[i:i + 2]  # 获取相邻的两碱基对
-            dH += nn_h.get(pair, 0)  # 查找该对的焓值
-            dS += nn_s.get(pair, 0)  # 查找该对的熵值
+            pair = sequence[i:i + 2]  # Get adjacent base pairs
+            dH += nn_h.get(pair, 0)  # Lookup enthalpy value for the pair
+            dS += nn_s.get(pair, 0)  # Lookup entropy value for the pair
 
-        # 转换单位：dH 从 cal/mol 转为 kcal/mol，dS 从 cal/mol·K 转为 kcal/mol·K
+        # Convert units: dH from cal/mol to kcal/mol, dS from cal/mol·K to kcal/mol·K
         dH *= -0.1
         dS *= -0.1
 
-        # 计算自由能（ΔG），单位为 kcal/mol
-        T =  333.15 # 60C
-        delta_g = dH - T * dS / 1000.0  # ΔG 公式
+        # Calculate free energy (ΔG) in kcal/mol
+        T = 333.15  # 60°C
+        delta_g = dH - T * dS / 1000.0  # ΔG formula
 
         return round(delta_g, 2)
 
-    # 分别计算5'端和3'端的ΔG
+    # Calculate ΔG for 5' and 3' ends separately
     five_prime_delta_g = round(calculate_delta_g(five_prime_seq), 2)
     three_prime_delta_g = round(calculate_delta_g(three_prime_seq), 2)
 
@@ -137,35 +137,36 @@ def calc_terminal_delta_g(primer, end_length=6):
 
 
 def if_secondary_structure(primer: str) -> tuple[bool, Any]:
-    # 定义发卡结构的最小和最大互补区段长度
+    # Define minimum and maximum complementary region lengths for hairpin structure
     min_stem_length = 4
     max_stem_length = 12
 
-    # 定义环状区段的长度范围
+    # Define the length range for loop regions
     min_loop_length = 4
     max_loop_length = 8
 
     if_hairpin = False
 
-    # 遍历引物序列，查找自互补区域
+    # Scan through the primer sequence for self-complementary regions
     for length in range(min_stem_length, max_stem_length + 1):
         for i in range(len(primer) - length):
             subseq = primer[i:i + length]
             rev_complement_subseq = reverse_complement(subseq)
 
-            # 检查剩余的序列中是否包含反向互补序列
+            # Check if the remaining sequence contains the reverse complementary sequence
             remaining_seq = primer[i + length:]
             index = remaining_seq.find(rev_complement_subseq)
 
             if index != -1:
-                # 找到互补序列后，计算第二段序列的起始位置和第一段序列的结束位置的差距
+                # If complementary sequence found, calculate the distance between the start of the second sequence
+                # and the end of the first sequence
                 distance = (i + length + index) - (i + length)
 
-                # 检查环状区段的长度是否在限制范围内
+                # Check if the loop region length is within the specified range
                 if min_loop_length <= distance <= max_loop_length:
                     if_hairpin = True
 
     hairpin = primer3.calc_hairpin(seq=primer)
-    hairpin_dG = round(hairpin.dg/1000,2)
+    hairpin_dG = round(hairpin.dg / 1000, 2)
 
     return if_hairpin, hairpin_dG
