@@ -1,38 +1,73 @@
 # LAMP Primer Auto design(LPAD) Tool
 
-### Overall Pipeline
+Loop-mediated isothermal amplification (LAMP) is a molecular diagnostic technique that amplifies nucleic acids at a constant temperature. It uses a chain replacement DNA polymerase and four specific primers to target six regions of the target
+gene. However, designing these primers is complex, limiting the number of companies in the market. Tools like PrimerExplorer5 and NEB LAMP assist in primer design but do not automate the output, making it challenging for users without experience. To solve this, our team developed the LAMP Primer Auto Design (LPAD) Tool, which automatically scores and ranks
+generated primers based on their characteristics and assesses their specificity against genomes, streamlining the design process for users.
+
+## Table of Contents
+
+- Overall Pipeline
+- Specific Implementation
+- Ownership
+
+## Overall Pipeline
 
 <img src="https://github.com/user-attachments/assets/937c5124-fdd5-4e4f-b3fd-21793d9fd273" width="500" />
 
-### 1. **设计需求**：
+### 1. **Design Objective**：
 
-LAMP扩增需要六个引物：前内引物 (FIP)、后内引物 (BIP)、两个外引物 (F3和B3)，以及两个环引物 (LF和LB)。这些引物是用来锁定特定的靶序列区域的。其中，环引物不一定是需要的。本项目主要针对于自动设计前内引物 (FIP)、后内引物 (BIP)、两个外引物 (F3和B3)，并自动化输出优质的F1,F2,F3;B1,B2,B3引物。
+LAMP amplification requires six primers: forward inner primer (FIP), backward inner primer (BIP), two outer primers (F3 and B3), and two loop primers (LF and LB). These primers are used to target specific sequence regions. Among them, loop primers are optional. This project mainly focuses on automatically designing the forward inner primer (FIP), backward inner primer (BIP), two outer primers (F3 and B3), and automatically outputting high-quality F1, F2, F3; B1, B2, B3 primers.
 
-### 2. **主要挑战**：
+### 2. **Main Challenges**：
 
-- **复杂的设计限制**：LAMP引物设计比传统的PCR引物复杂，需要考虑多个因素：
-    - **特异性**：引物只能结合在目标序列上，不能在其他污染序列上（人类基因组）扩增。
-    - **熔解温度 (Tm)**：最佳范围是58-63°C。
-    - **GC含量**：理想值是40-60%。
-    - **ΔG（自由能）**：需要保持低ΔG，防止引物不稳定
-    - **二级结构预测和二聚体**：避免产生发卡结构，二聚体等。
-    - **引物间距**：LAMP引物设计要求非常严格的间距和结合模式，比如FIP和BIP要在目标序列上相隔一定的距离，确保高效的环状结构形成，从而实现等温扩增。
+- **Complex Design Constraints**: LAMP primer design is more complex than traditional PCR primers and requires consideration of multiple factors:
+    - **Specificity**: Primers should bind only to the target sequence and not amplify any other contaminating sequences (e.g., human genome).
+    - **Melting Temperature (Tm)**: The optimal range is 58-63°C.
+    - **GC Content**: The ideal value is 40-60%.
+    - **ΔG (Free Energy)**: Low ΔG is required to prevent primer instability.
+    - **Secondary Structure Prediction and Dimers**: Avoid hairpin structures, dimers, etc.
+    - **Primer Spacing**: LAMP primer design requires very strict spacing and binding patterns, such as ensuring that FIP and BIP are separated by a specific distance on the target sequence to ensure efficient loop formation and isothermal amplification.
 
-### 3. **工具流程**：
 
-- **输入数据**：
-    - 工具输入包括靶序列的比对信息（你希望扩增的区域）和背景基因组信息（你不希望扩增的区域）。
-- **序列比对和引物生成**：
-    - 引物在一定的限制条件下（长度、间距）从靶序列中生成，且严格检查特异性，防止引物与背景（污染）基因组结合。
-- **定义限制条件和评分标准**：
-    - 对每个候选引物进行约束条件的评估（如Tm、GC含量、自由能），并根据其符合程度赋予分数。
-    - 加入二级结构预测和二聚体形成过滤，这将进一步提高评分准确性，剔除潜在问题引物。
-- **输出结果**：
-    - 工具将输出排好序的引物组合，按分数从高到低列出最佳候选供用户选择。
+### 3. **Tool Workflow**：
 
-## 目前思路：
+- **Configure Environment**:
+    - Ensure that Conda is installed on your computer. To install the necessary dependencies, please use the provided `environment.yml` file with Conda:
 
-### 算法可行性：
+```bash
+conda env create -f environment.yml
+```
+
+    - This will create a new Conda environment with all the dependencies required for the project. If you want to use this program, please move to the current program's home directory and activate the conda environment:
+
+```bash
+conda activate lpad
+```
+
+- **Input Data**：
+    - The tool input includes alignment information of the target sequence (the region you want to amplify) and background genome information (the regions you do not want to amplify).
+
+```bash
+# Use the default path
+python LPAD.py
+```
+
+```bash
+# You can also specifies the custom path (Note that using the default path requires the file of the human reference genome to be pre-placed in the folder './data/resource')
+python LPAD.py -i /path/to/your/input.fasta -r /path/to/your/reference.fasta -o /path/to/output/directory
+```
+
+- **Sequence Alignment and Primer Generation**:
+    - Primers are generated from the target sequence under certain constraints (length, spacing) and are strictly checked for specificity to prevent binding to the background (contaminating) genome
+- **Defining Constraints and Scoring Criteria**:
+    - Each candidate primer is evaluated against constraint conditions (such as Tm, GC content, free energy) and is assigned a score based on how well it meets these conditions.
+    - Secondary structure prediction and dimer formation filtering are added, which further improves scoring accuracy and eliminates potential problematic primers.
+- **Output Results**:
+    - The tool will output a sorted list of primer combinations, ranked from highest to lowest score, providing the best candidates for user selection. The output files are stored in `'./data/output/Final_score'`, and other intermediate files are stored in `'./data/output/Intermediate_file'`
+
+## Specific Implementation: 
+
+### Feasibility of Algorithm: 
 
 - **TM**:
 
@@ -59,28 +94,35 @@ stability.   The 3’ ends of F2/B2, F3/B3, and LF/LB and the 5’ end of F1c/B1
 is –4 kcal/ mol or less. The 5’ end of F1c after amplification corresponds to the 3’ end of F1, so that stability is 
 important.
 
-- **引物间距**:
+- **Primer Spacing**:
 
 <img src="https://github.com/user-attachments/assets/b17927cc-ba45-47dc-9bfc-23f14752519c" width="700" />
 
-（参考Primer Explorer文档）
+(Refer to the documentation of `Primer Explorer`)
 
-- **二级结构预测和二聚体**:
+- **Secondary Structure Prediction and Dimerization**:
 
-考虑序列内部不会产生互补序列(hairpin),以及序列间不会互补(dimer)
+Consider that there are no complementary sequences within the sequences (hairpin) and no complementary sequences between the sequences (dimer).
 
-hairpin设计：1. 发卡结构的互补区段长度在6-12bp，2. 环状区段的长度范围4-8bp.
+The design of hairpin: 1. The complementary segment length for hairpin structures should be between 6-12 bp. 2. The length of the loop segment should be within the range of 4-8 bp.
 
-dimer设计：检查是否序列间有8-16bp的互补区域.
+The design of dimer: Check whether there are 8-16bp complementary regions between the sequences.
 
-- **评分系统**:
+- **Scoring System**:
   
-1. 对单个引物的各个特征/以及引物组的特征进行初步评分
-2. 使用LAMPPrimerBank数据库数据与nonsense primer数据进行决策树模型训练，确定各特征的权值
-3. 引物集(F1-3,B1-3)的总分为各个特征的初评分*权值(第二步获得)
+1. Preliminary scoring of individual features of individual primers/and features of primer sets
+2. The LAMPPrimerBank database data and nonsense primer data are used to train the decision tree model, and the weights of each feature are determined
+3. The total score of primer sets (F1-3,B1-3) is the initial score of each feature * weight (obtained in the second step)
 
-### Benchmark 三步：
+### Benchmark：
 
-1. primer可行性：取published文章中的扩增序列与选用的primer，将扩增序列投入检查是否结果中有对应primer且分数良好；
-2. 工具可行性：取任何published文章中使用的primer，投入我们的工具，检查primer的分数是否较好；
-3. 各工具对比：取相同扩增序列若干，投入PrimerExplorer5, NEB LAMP and PremierBiosoft，检查各个工具结果是否类似。
+1. primer feasibility: Take the amplified sequence and the selected primer in the published article, and put the amplified sequence into the results to check whether there is the corresponding primer and the score is good;
+2. Tool feasibility: Take the primer used in any published article and put it into our tool to check whether the primer score is better;
+3. Comparison of different tools: the same amplified sequences were selected and input into PrimerExplorer5, NEB LAMP and PremierBiosoft to check whether the results of each tool were similar.
+
+## Ownership
+
+Yihuan XU, Guobiao YE, Yicheng QI, Zhongyu SHI, and Hancheng YU
+
+Zhejiang University-University of Edinburgh Institute, China.
+
