@@ -57,7 +57,7 @@ LAMP amplification requires six primers: forward inner primer (FIP), backward in
         python LPAD.py -i /path/to/your/input.fasta -r /path/to/your/reference.fasta -o /path/to/output/directory
         ```
 
-    - If you want to specify the parameters for individual LAMP primers, modify the parameters for the corresponding primer file in the folder './configs'
+    - If you want to specify the parameters for individual LAMP primers, modify the parameters for the corresponding primer file in the folder `'./configs'`
 
 - **Sequence Alignment and Primer Generation**:
     - Primers are generated from the target sequence under certain constraints (length, spacing) and are strictly checked for specificity to prevent binding to the background (contaminating) genome
