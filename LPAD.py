@@ -14,6 +14,7 @@ def main(input_file, ref_file, output):
     process_input_file()
     save_full_scores()
     merge_results(output_dir=output)
+    print(f"The final results have been saved to {output}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Find primers for a given FASTA file.')
