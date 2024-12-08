@@ -53,7 +53,7 @@ LAMP amplification requires six primers: forward inner primer (FIP), backward in
         ```
 
         ```bash
-        # You can also specifies the custom path (Note that using the default path requires the file of the human reference genome to be pre-placed in the folder './data/resource')
+        # You can also specifies the custom path (Note that using the default path requires the file of the background genome to be pre-placed in the folder './data/resource')
         python LPAD.py -i /path/to/your/input.fasta -r /path/to/your/reference.fasta -o /path/to/output/directory
         ```
 
