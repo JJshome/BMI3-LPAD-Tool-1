@@ -8,6 +8,10 @@ We developed the LAMP Primer Auto Design (LPAD) Tool to automate primer design f
 - Specific Implementation
 - Ownership
 
+## Operation System
+
+We strongly recommend using **Linux** or **MacOS** to run the tool.
+
 ## Overall Pipeline
 
 <img src="https://github.com/user-attachments/assets/937c5124-fdd5-4e4f-b3fd-21793d9fd273" width="500" />
@@ -89,7 +93,7 @@ stability.   The 3’ ends of F2/B2, F3/B3, and LF/LB and the 5’ end of F1c/B1
 is –4 kcal/ mol or less. The 5’ end of F1c after amplification corresponds to the 3’ end of F1, so that stability is 
 important.
 
-- **Primer Spacing**:
+- **Primer Distance**:
 
 <img src="https://github.com/user-attachments/assets/b17927cc-ba45-47dc-9bfc-23f14752519c" width="700" />
 
@@ -102,18 +106,6 @@ Consider that there are no complementary sequences within the sequences (hairpin
 The design of hairpin: 1. The complementary segment length for hairpin structures should be between 6-12 bp. 2. The length of the loop segment should be within the range of 4-8 bp.
 
 The design of dimer: Check whether there are 8-16bp complementary regions between the sequences.
-
-- **Scoring System**:
-  
-1. Preliminary scoring of individual features of individual primers/and features of primer sets
-2. The LAMPPrimerBank database data and nonsense primer data are used to train the decision tree model, and the weights of each feature are determined
-3. The total score of primer sets (F1-3,B1-3) is the initial score of each feature * weight (obtained in the second step)
-
-### Benchmark：
-
-1. primer feasibility: Take the amplified sequence and the selected primer in the published article, and put the amplified sequence into the results to check whether there is the corresponding primer and the score is good;
-2. Tool feasibility: Take the primer used in any published article and put it into our tool to check whether the primer score is better;
-3. Comparison of different tools: the same amplified sequences were selected and input into PrimerExplorer5, NEB LAMP and PremierBiosoft to check whether the results of each tool were similar.
 
 ## Ownership
 
