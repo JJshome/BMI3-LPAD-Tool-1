@@ -69,7 +69,7 @@ def filter_forward_oligos(oligos, sequence, mutation_list, weight = 0.1):
         mutation_sum = sum(mutation_list[position:position + length])
 
         # Adjust the oligo's penalty
-        adjusted_penalty = oligo.get('penalty', 0) - (mutation_sum * weight)
+        adjusted_penalty = oligo.get('penalty') + (mutation_sum * weight)
 
         # Update the oligo's penalty in the dictionary
         oligo['penalty'] = adjusted_penalty
@@ -126,7 +126,7 @@ def filter_reverse_oligos(oligos, sequence, mutation_list, weight = 0.1):
         mutation_sum = sum(mutation_list[position - length + 1:position + 1])
 
         # Adjust the oligo's penalty
-        adjusted_penalty = oligo.get('penalty', 0) - (mutation_sum * weight)
+        adjusted_penalty = oligo.get('penalty') + (mutation_sum * weight)
 
         # Update the oligo's penalty in the dictionary
         oligo['penalty'] = adjusted_penalty
