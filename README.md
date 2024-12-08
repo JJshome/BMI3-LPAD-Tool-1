@@ -40,7 +40,7 @@ LAMP amplification requires six primers: forward inner primer (FIP), backward in
         ```
 
         ```bash
-        # You can also specifies the custom path
+        # You can also specifies the custom path under the BMI3-LPAD-Tool folder
         python LPAD.py -i /path/to/your/input.fasta -r /path/to/your/reference.fasta -o /path/to/output/directory
         ```
 
