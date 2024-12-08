@@ -1,8 +1,6 @@
 # LAMP Primer Auto design(LPAD) Tool
 
-Loop-mediated isothermal amplification (LAMP) is a molecular diagnostic technique that amplifies nucleic acids at a constant temperature. It uses a chain replacement DNA polymerase and four specific primers to target six regions of the target
-gene. However, designing these primers is complex, limiting the number of companies in the market. Tools like PrimerExplorer5 and NEB LAMP assist in primer design but do not automate the output, making it challenging for users without experience. To solve this, our team developed the LAMP Primer Auto Design (LPAD) Tool, which automatically scores and ranks
-generated primers based on their characteristics and assesses their specificity against genomes, streamlining the design process for users.
+We developed the LAMP Primer Auto Design (LPAD) Tool to automate primer design for Loop-mediated Isothermal Amplification (LAMP). The tool scores primers based on key features such as melting temperature (Tm), GC content, terminal ΔG, primer distance, and secondary structure. Primer specificity is assessed using BLAST alignment against a user-defined reference genome. A Random Forest model is then used to predict primer quality and rank the primer sets. Evaluation on real and simulated datasets demonstrates a high model accuracy. In conclusion, LPAD provides a more efficient and comprehensive solution for LAMP primer design compared to existing tools.
 
 ## Table of Contents
 
@@ -18,18 +16,7 @@ generated primers based on their characteristics and assesses their specificity 
 
 LAMP amplification requires six primers: forward inner primer (FIP), backward inner primer (BIP), two outer primers (F3 and B3), and two loop primers (LF and LB). These primers are used to target specific sequence regions. Among them, loop primers are optional. This project mainly focuses on automatically designing the forward inner primer (FIP), backward inner primer (BIP), two outer primers (F3 and B3), and automatically outputting high-quality F1, F2, F3; B1, B2, B3 primers.
 
-### 2. **Main Challenges**：
-
-- **Complex Design Constraints**: LAMP primer design is more complex than traditional PCR primers and requires consideration of multiple factors:
-    - **Specificity**: Primers should bind only to the target sequence and not amplify any other contaminating sequences (e.g., human genome).
-    - **Melting Temperature (Tm)**: The optimal range is 58-63°C.
-    - **GC Content**: The ideal value is 40-60%.
-    - **ΔG (Free Energy)**: Low ΔG is required to prevent primer instability.
-    - **Secondary Structure Prediction and Dimers**: Avoid hairpin structures, dimers, etc.
-    - **Primer Spacing**: LAMP primer design requires very strict spacing and binding patterns, such as ensuring that FIP and BIP are separated by a specific distance on the target sequence to ensure efficient loop formation and isothermal amplification.
-
-
-### 3. **Tool Workflow**：
+### 2. **Tool Workflow**：
 
 - **Configure Environment**:
     - Ensure that Conda is installed on your computer. To install the necessary dependencies, please use the provided `environment.yml` file with Conda:
