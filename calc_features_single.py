@@ -136,7 +136,7 @@ def calc_terminal_delta_g(primer, end_length=6):
     return five_prime_delta_g, three_prime_delta_g
 
 
-def if_secondary_structure(primer: str) -> tuple[bool, Any]:
+def if_secondary_structure(primer: str) -> Tuple[bool, Any]:
     # Define minimum and maximum complementary region lengths for hairpin structure
     min_stem_length = 4
     max_stem_length = 12
