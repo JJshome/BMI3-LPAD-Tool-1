@@ -34,9 +34,9 @@ LAMP amplification requires six primers: forward inner primer (FIP), backward in
 - **Configure Environment**:
     - Ensure that Conda is installed on your computer. To install the necessary dependencies, please use the provided `environment.yml` file with Conda:
 
-```bash
-conda env create -f environment.yml
-```
+    ```bash
+    conda env create -f environment.yml
+    ```
 
     - This will create a new Conda environment with all the dependencies required for the project. If you want to use this program, please move to the current program's home directory and activate the conda environment:
 
