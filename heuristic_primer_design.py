@@ -85,16 +85,17 @@ def find_primers(fasta_file):
                                               sequence_length, is_reverse=False)
         reverse_outer_oligos = oligos.extract_oligos(runprimer3.run_primer3(sequence, outer_primer_params, reverse=True), sequence_length,
                                               is_reverse=True)
-
-        if quasispecies_sequences:
-            forward_inner_oligos = mutant.filter_forward_oligos(forward_outer_oligos, sequence, quasispecies_sequences)
-            reverse_inner_oligos = mutant.filter_reverse_oligos(reverse_outer_oligos, sequence, quasispecies_sequences)
-            forward_loop_oligos = mutant.filter_reverse_oligos(forward_outer_oligos, sequence, quasispecies_sequences)
-            reverse_loop_oligos = mutant.filter_forward_oligos(reverse_outer_oligos, sequence, quasispecies_sequences)
-            forward_middle_oligos = mutant.filter_forward_oligos(forward_outer_oligos, sequence, quasispecies_sequences)
-            reverse_middle_oligos = mutant.filter_reverse_oligos(reverse_outer_oligos, sequence, quasispecies_sequences)
-            forward_outer_oligos = mutant.filter_forward_oligos(forward_outer_oligos, sequence, quasispecies_sequences)
-            reverse_outer_oligos = mutant.filter_reverse_oligos(reverse_outer_oligos, sequence, quasispecies_sequences)
+        
+        # This chunk of code should perform mutant filtering, but still requires improvement
+        #if quasispecies_sequences:
+            #forward_inner_oligos = mutant.filter_forward_oligos(forward_outer_oligos, sequence, quasispecies_sequences)
+            #reverse_inner_oligos = mutant.filter_reverse_oligos(reverse_outer_oligos, sequence, quasispecies_sequences)
+            #forward_loop_oligos = mutant.filter_reverse_oligos(forward_outer_oligos, sequence, quasispecies_sequences)
+            #reverse_loop_oligos = mutant.filter_forward_oligos(reverse_outer_oligos, sequence, quasispecies_sequences)
+            #forward_middle_oligos = mutant.filter_forward_oligos(forward_outer_oligos, sequence, quasispecies_sequences)
+            #reverse_middle_oligos = mutant.filter_reverse_oligos(reverse_outer_oligos, sequence, quasispecies_sequences)
+            #forward_outer_oligos = mutant.filter_forward_oligos(forward_outer_oligos, sequence, quasispecies_sequences)
+            #reverse_outer_oligos = mutant.filter_reverse_oligos(reverse_outer_oligos, sequence, quasispecies_sequences)
 
         print("All oligos found!")
         print(
