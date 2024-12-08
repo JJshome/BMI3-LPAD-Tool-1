@@ -6,7 +6,7 @@ from final_output import merge_results
  
 DEFAULT_INPUT_FILE = './data/input/example.fasta'
 DEFAULT_REF_FILE = '"./data/resource/hg38.fa"'
-DEFAULT_OUTPUT_DIR = './data/output/Final_score'
+DEFAULT_OUTPUT_DIR = './data/output/Final_score/'
 
 def main(input_file, ref_file, output):
     find_primers(input_file)
