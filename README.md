@@ -48,14 +48,16 @@ LAMP amplification requires six primers: forward inner primer (FIP), backward in
     - The tool input includes alignment information of the target sequence (the region you want to amplify) and background genome information (the regions you do not want to amplify).
 
         ```bash
-        # Use the default path
+        # Use the default path (Note that using the default path requires the file of the background genome to be pre-placed in the folder './data/resource')
         python LPAD.py
         ```
 
         ```bash
-        # You can also specifies the custom path (Note that using the default path requires the file of the background genome to be pre-placed in the folder './data/resource')
+        # You can also specifies the custom path
         python LPAD.py -i /path/to/your/input.fasta -r /path/to/your/reference.fasta -o /path/to/output/directory
         ```
+
+    - If you want to specify the parameters for individual LAMP primers, modify the parameters for the corresponding primer file in the folder './configs'
 
 - **Sequence Alignment and Primer Generation**:
     - Primers are generated from the target sequence under certain constraints (length, spacing) and are strictly checked for specificity to prevent binding to the background (contaminating) genome
