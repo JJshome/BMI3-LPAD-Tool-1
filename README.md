@@ -62,7 +62,7 @@ LAMP amplification requires six primers: forward inner primer (FIP), backward in
     - Each candidate primer is evaluated against constraint conditions (such as Tm, GC content, free energy) and is assigned a score based on how well it meets these conditions.
     - Secondary structure prediction and dimer formation filtering are added, which further improves scoring accuracy and eliminates potential problematic primers.
 - **Output Results**:
-    - The tool will output a sorted list of primer combinations, ranked from highest to lowest score, providing the best candidates for user selection. The output files are stored in `'./data/output/Final_score'`, and other intermediate files are stored in `'./data/output/Intermediate_file'`
+    - The tool will output a sorted list of primer combinations, ranked from highest to lowest score, providing the best candidates for user selection. The output files are stored in `'./data/output/Final_score/'`, and other intermediate files are stored in `'./data/output/Intermediate_file/'`
 
 ## Specific Implementation: 
 
