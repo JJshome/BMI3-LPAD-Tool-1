@@ -18,6 +18,11 @@ LAMP amplification requires six primers: forward inner primer (FIP), backward in
 
 ### 2. **Tool Workflow**：
 
+- **Clone Respiratory**
+    ```bash
+     git clone https://github.com/YiCQi/BMI3-LPAD-Tool/8
+    ```
+    
 - **Configure Environment**:
     - Ensure that Conda is installed on your computer. To install the necessary dependencies, please use the provided `environment.yml` file with Conda:
 
