@@ -20,7 +20,7 @@ LAMP amplification requires six primers: forward inner primer (FIP), backward in
 
 - **Clone Respiratory**
     ```bash
-     git clone https://github.com/YiCQi/BMI3-LPAD-Tool/8
+     git clone https://github.com/YiCQi/BMI3-LPAD-Tool/
     ```
     
 - **Configure Environment**:
