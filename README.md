@@ -34,28 +34,28 @@ LAMP amplification requires six primers: forward inner primer (FIP), backward in
 - **Configure Environment**:
     - Ensure that Conda is installed on your computer. To install the necessary dependencies, please use the provided `environment.yml` file with Conda:
 
-    ```bash
-    conda env create -f environment.yml
-    ```
+        ```bash
+        conda env create -f environment.yml
+        ```
 
     - This will create a new Conda environment with all the dependencies required for the project. If you want to use this program, please move to the current program's home directory and activate the conda environment:
 
-```bash
-conda activate lpad
-```
+        ```bash
+        conda activate lpad
+        ```
 
 - **Input Data**：
     - The tool input includes alignment information of the target sequence (the region you want to amplify) and background genome information (the regions you do not want to amplify).
 
-```bash
-# Use the default path
-python LPAD.py
-```
+        ```bash
+        # Use the default path
+        python LPAD.py
+        ```
 
-```bash
-# You can also specifies the custom path (Note that using the default path requires the file of the human reference genome to be pre-placed in the folder './data/resource')
-python LPAD.py -i /path/to/your/input.fasta -r /path/to/your/reference.fasta -o /path/to/output/directory
-```
+        ```bash
+        # You can also specifies the custom path (Note that using the default path requires the file of the human reference genome to be pre-placed in the folder './data/resource')
+        python LPAD.py -i /path/to/your/input.fasta -r /path/to/your/reference.fasta -o /path/to/output/directory
+        ```
 
 - **Sequence Alignment and Primer Generation**:
     - Primers are generated from the target sequence under certain constraints (length, spacing) and are strictly checked for specificity to prevent binding to the background (contaminating) genome
