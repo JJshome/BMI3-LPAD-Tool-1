@@ -12,5 +12,4 @@ dependencies:
   - pandas
   - blast
   - joblib
-  - argparse
   - scipy
