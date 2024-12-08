@@ -86,7 +86,7 @@ def find_primers(fasta_file):
         reverse_outer_oligos = oligos.extract_oligos(runprimer3.run_primer3(sequence, outer_primer_params, reverse=True), sequence_length,
                                               is_reverse=True)
         
-        # This chunk of code should performs mutant filtering
+        # This chunk of code add penalty for mutant
         if quasispecies_sequences:
             mutation_list = mutant.generate_mutation_list(sequence, quasispecies_sequences)
             forward_inner_oligos = mutant.filter_forward_oligos(forward_inner_oligos, sequence, mutation_list)
