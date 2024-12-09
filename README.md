@@ -58,7 +58,7 @@ LAMP amplification requires six primers: forward inner primer (FIP), backward in
     - The tool input includes alignment information of the target sequence (the region you want to amplify) and background genome information (the regions you do not want to amplify).
 
         ```bash
-        # Use the default path (*** Note!!! This way requires the *extracted* fasta file of the background genome 'hg38.fa' to be pre-placed in the folder './data/resource' ***)
+        # Use the default path (*** Note!!! This way requires the fasta file of the background genome 'hg38.fa' to be pre-placed in the folder './data/resource' ***)
         python LPAD.py
         ```
 
