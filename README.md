@@ -12,10 +12,10 @@ We developed the LAMP Primer Auto Design (LPAD) Tool to automate primer design f
 ## Environment
 The environment configuration is provided in the file `environment.yml`.
 
-### Operation System
+### 1. **Operation System**
 We strongly recommend using **Linux** or **MacOS** to run the tool.
 
-### Dependencies
+### 2. **Dependencies**
   - python=3.8
   - primer3-py
   - biopython=1.78
