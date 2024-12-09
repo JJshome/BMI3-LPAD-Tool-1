@@ -17,13 +17,13 @@ We strongly recommend using **Linux** or **MacOS** to run the tool.
 
 ### 2. **Dependencies**
   - python=3.8
-  - primer3-py
+  - primer3-py=2.0.3
   - biopython=1.78
-  - pandas
-  - blast
-  - joblib
-  - scipy
-  - scikit-learn
+  - pandas=2.0.3
+  - blast=2.16.0
+  - joblib=1.4.2
+  - scipy=1.10.1
+  - scikit-learn=1.3.0
 
 ## Overall Pipeline
 
