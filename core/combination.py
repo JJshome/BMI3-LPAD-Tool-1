@@ -151,3 +151,153 @@ def find_best_forward_combinations(
     forward_set_count = sum(1 for item in best_forward_infos if item is not None)
 
     return best_forward_infos, best_forward_penalties, forward_set_count
+
+
+def find_best_reverse_combinations(
+        inner_reverse, loop_reverse, middle_reverse, outer_reverse,
+        signature_max_length, min_primer_spacing, loop_min_gap,
+        include_loop_primers, ideal_gap, distance_penalties,
+        penalty_weights,  # [inner, loop, middle, outer]
+        to_penalty_weights  # [inner_to_loop, loop_to_middle, middle_to_outer]
+):
+    """
+    Find the best reverse primer combinations based on penalties and spacing constraints.
+
+    :param inner_reverse: List of inner reverse primers (list of dicts).
+    :param loop_reverse: List of loop reverse primers (list of dicts).
+    :param middle_reverse: List of middle reverse primers (list of dicts).
+    :param outer_reverse: List of outer reverse primers (list of dicts).
+    :param signature_max_length: Maximum allowed length of a signature.
+    :param min_primer_spacing: Minimum spacing between primers.
+    :param loop_min_gap: Minimum gap for loop primers.
+    :param include_loop_primers: Whether to include loop primers.
+    :param distance_penalties: List of penalties for inter-primer distances.
+    :param penalty_weights: List of weights for [inner, loop, middle, outer] primers.
+    :param to_penalty_weights: List of weights for [inner_to_loop, loop_to_middle, middle_to_outer] distances.
+    :return: Tuple of best reverse infos and penalties.
+    """
+    # Unpack weights for individual penalties
+    inner_penalty_weight, loop_penalty_weight, middle_penalty_weight, outer_penalty_weight = penalty_weights
+
+    # Unpack weights for inter-primer penalties
+    inner_to_loop_penalty_weight, loop_to_middle_penalty_weight, middle_to_outer_penalty_weight = to_penalty_weights
+
+    best_reverse_infos = []
+    best_reverse_penalties = []
+    reverse_set_count = 0
+
+    for inner_index, inner_info in enumerate(inner_reverse):
+        inner_location = inner_info['position']
+        inner_length = inner_info['length']
+        inner_penalty = inner_info['penalty']
+
+        best_set_penalty = float('inf')  # Start with a large initial penalty
+
+        # Calculate search range for loop primers
+        search_end_at = inner_location + signature_max_length - inner_length - 20
+        loop_start_at = inner_location + 1 + min_primer_spacing
+        loop_end_at = search_end_at
+
+        # Handle loop primer placeholder if loop primers are not included
+        if not include_loop_primers:
+            placeholder_primer = {'position': loop_start_at - 1, 'length': 1, 'penalty': 0}
+            loop_reverse = [placeholder_primer]
+
+        for loop_info in loop_reverse:
+            loop_location = loop_info['position']
+            loop_length = loop_info['length']
+            loop_penalty = loop_info['penalty']
+
+            # Check loop primer position range
+            if loop_location < loop_start_at and loop_length != 1:
+                continue
+            if loop_location > loop_end_at and loop_length != 1:
+                break
+
+            # Calculate range for middle primers
+            middle_start_at = max(loop_location + loop_length + min_primer_spacing,
+                                  inner_location + loop_min_gap + 1)
+            middle_end_at = search_end_at
+
+            inner_to_loop_distance = loop_location - (inner_location + 1)
+
+            for middle_info in middle_reverse:
+                middle_location = middle_info['position']
+                middle_length = middle_info['length']
+                middle_penalty = middle_info['penalty']
+
+                # Check middle primer position range
+                if middle_location < middle_start_at:
+                    continue
+                if middle_location > middle_end_at:
+                    break
+
+                # Check spacing constraints for middle primers
+                if (middle_location - middle_length - min_primer_spacing < loop_location + loop_length - 1) or \
+                        (middle_location - middle_length - loop_min_gap < inner_location):
+                    continue
+
+                # Calculate range for outer primers
+                outer_start_at = middle_location + min_primer_spacing + 1
+                outer_end_at = search_end_at
+
+                loop_to_middle_distance = (middle_location - middle_length + 1) - \
+                                          (loop_location + loop_length)
+
+                for outer_info in outer_reverse:
+                    outer_location = outer_info['position']
+                    outer_length = outer_info['length']
+                    outer_penalty = outer_info['penalty']
+
+                    # Check outer primer position range
+                    if outer_location < outer_start_at:
+                        continue
+                    if outer_location > outer_end_at:
+                        break
+
+                    # Check spacing constraints for outer primers
+                    if outer_location - outer_length - min_primer_spacing < middle_location:
+                        continue
+
+                    middle_to_outer_distance = (outer_location - outer_length) - middle_location
+                    inner_to_middle_distance = (middle_location - middle_length) - inner_location
+
+                    # Calculate penalties
+                    if include_loop_primers:
+                        spacing_penalty = (
+                                distance_penalties[abs(inner_to_loop_distance-ideal_gap)] * inner_to_loop_penalty_weight +
+                                distance_penalties[abs(loop_to_middle_distance-ideal_gap)] * loop_to_middle_penalty_weight +
+                                distance_penalties[abs(middle_to_outer_distance-ideal_gap)] * middle_to_outer_penalty_weight
+                        )
+                        primer3_penalty = (
+                                inner_penalty * inner_penalty_weight +
+                                loop_penalty * loop_penalty_weight +
+                                middle_penalty * middle_penalty_weight +
+                                outer_penalty * outer_penalty_weight
+                        )
+                    else:
+                        spacing_penalty = (
+                                distance_penalties[inner_to_middle_distance - 30] * inner_to_loop_penalty_weight +
+                                distance_penalties[abs(middle_to_outer_distance-ideal_gap)] * middle_to_outer_penalty_weight
+                        )
+                        primer3_penalty = (
+                                inner_penalty * inner_penalty_weight +
+                                middle_penalty * middle_penalty_weight +
+                                outer_penalty * outer_penalty_weight
+                        )
+
+                    reverse_set_penalty = spacing_penalty + primer3_penalty
+
+                    # Update best combination if penalty is lower
+                    if reverse_set_penalty < best_set_penalty:
+                        best_set_penalty = reverse_set_penalty
+                        while len(best_reverse_infos) <= inner_index:
+                            best_reverse_infos.append(None)
+                        while len(best_reverse_penalties) <= inner_index:
+                            best_reverse_penalties.append(None)
+                        best_reverse_infos[inner_index] = [loop_info, middle_info, outer_info]
+                        best_reverse_penalties[inner_index] = [spacing_penalty, primer3_penalty]
+
+    reverse_set_count = sum(1 for item in best_reverse_infos if item is not None)
+
+    return best_reverse_infos, best_reverse_penalties, reverse_set_count
