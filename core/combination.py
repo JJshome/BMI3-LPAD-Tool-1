@@ -301,3 +301,143 @@ def find_best_reverse_combinations(
     reverse_set_count = sum(1 for item in best_reverse_infos if item is not None)
 
     return best_reverse_infos, best_reverse_penalties, reverse_set_count
+
+
+def find_possible_result(
+        forward_inner_candidates,
+        reverse_inner_candidates,
+        best_forward_infos,
+        best_reverse_infos,
+        best_forward_penalties,
+        best_reverse_penalties,
+        signature_max_length,
+        min_inner_pair_spacing,
+        opt_inner_pair_spacing,
+        Tm_penalties,
+        distance_penalties,
+        include_loop_primers,
+        output_file_path
+):
+    # Initialize variables
+    possible_result = []
+    previous_first_compatible_index = 0  # Bound the lower end of the inner loop
+
+    # Iterate over the forward inner candidates
+    for i in range(len(forward_inner_candidates)):
+        if i >= len(best_forward_infos) or not best_forward_infos[i]:
+            continue
+
+        finner_info = forward_inner_candidates[i]
+        floop_info, fmiddle_info, fouter_info = best_forward_infos[i]
+        forward_spacing_penalty, forward_primer3_penalty = best_forward_penalties[i]
+
+        forward_start = fouter_info["position"]
+        forward_end = finner_info["position"] + finner_info["length"] - 1
+
+        # Bound the upper end of the inner loop search
+        max_reverse_location = forward_start + signature_max_length - 1
+        previous_compatible_index_found = False
+
+        # Iterate over the reverse inner candidates
+        for j in range(previous_first_compatible_index, len(reverse_inner_candidates)):
+            if j >= len(best_reverse_infos) or not best_reverse_infos[j]:
+                continue
+
+            binner_info = reverse_inner_candidates[j]
+            bloop_info, bmiddle_info, bouter_info = best_reverse_infos[j]
+            reverse_spacing_penalty, reverse_primer3_penalty = best_reverse_penalties[j]
+
+            reverse_end = bouter_info["position"]
+            reverse_start = binner_info["position"] - binner_info["length"] + 1
+
+            # Skip primers located too far 5' with respect to the forward primer
+            if not previous_compatible_index_found:
+                if reverse_start <= forward_end:
+                    continue
+                else:
+                    previous_first_compatible_index = j
+                    previous_compatible_index_found = True
+
+            # Stop searching if the inner loop bounds are exceeded
+            if reverse_start > max_reverse_location:
+                break
+
+            # Enforce minimum inner spacing distance
+            inner_spacing = reverse_start - (forward_end + 1)
+            if inner_spacing < min_inner_pair_spacing:
+                continue
+
+            # Enforce max signature length
+            if reverse_end - (forward_start + 1) > signature_max_length:
+                continue
+
+            # Calculate penalties
+            inner_spacing_penalty = distance_penalties[inner_spacing - opt_inner_pair_spacing] * 1  # Example weight: 1
+
+            if include_loop_primers:
+                Total_Tm_diff = (abs(finner_info['TM'] - binner_info['TM']) + abs(
+                    fmiddle_info['TM'] - bmiddle_info['TM']) + abs(fouter_info['TM'] - bouter_info['TM']) + abs(
+                    floop_info['TM'] - bloop_info['TM'])) * Tm_penalties
+            else:
+                Total_Tm_diff = (abs(finner_info['TM'] - binner_info['TM']) + abs(
+                    fmiddle_info['TM'] - bmiddle_info['TM']) + abs(
+                    fouter_info['TM'] - bouter_info['TM'])) * Tm_penalties
+
+            total_penalty = forward_spacing_penalty + inner_spacing_penalty + reverse_spacing_penalty + forward_primer3_penalty + reverse_primer3_penalty + Total_Tm_diff
+
+            # Construct result object (dictionary-based structure for simplicity)
+            result = {
+                "forward_inner_info": finner_info,
+                "reverse_inner_info": binner_info,
+                "forward_middle_info": fmiddle_info,
+                "reverse_middle_info": bmiddle_info,
+                "forward_outer_info": fouter_info,
+                "reverse_outer_info": bouter_info,
+                "penalty": total_penalty,
+            }
+
+            if include_loop_primers:
+                result["floop_info"] = floop_info
+                result["bloop_info"] = bloop_info
+                result["has_loop_primers"] = True
+
+            possible_result.append(result)
+
+    # Filter result by overlap (mock function, you can replace it with your actual logic)
+    possible_result = reduce_result_by_overlap(possible_result)
+
+    if len(possible_result) == 0:
+        print("Failed to find result.")
+        return
+
+    print(f"Found {len(possible_result)} possible LAMP primer combinations")
+
+    # Sort result by penalty
+    possible_result.sort(key=lambda x: x["penalty"])
+
+    # Write result to CSV
+    fieldnames = [
+        "penalty",
+        "forward_inner_info", "reverse_inner_info",
+        "forward_middle_info", "reverse_middle_info",
+        "forward_outer_info", "reverse_outer_info",
+        "floop_info", "bloop_info", "has_loop_primers"
+    ]
+    with open(output_file_path, "w", newline="") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for result in possible_result:
+            writer.writerow({
+                "penalty": result["penalty"],
+                "forward_inner_info": result.get("forward_inner_info"),
+                "reverse_inner_info": result.get("reverse_inner_info"),
+                "forward_middle_info": result.get("forward_middle_info"),
+                "reverse_middle_info": result.get("reverse_middle_info"),
+                "forward_outer_info": result.get("forward_outer_info"),
+                "reverse_outer_info": result.get("reverse_outer_info"),
+                "floop_info": result.get("floop_info", None),
+                "bloop_info": result.get("bloop_info", None),
+                "has_loop_primers": result.get("has_loop_primers", False),
+            })
+
+    print(f"Output written to {output_file_path}")
